@@ -1,5 +1,5 @@
 
-# Welcome to your Peepmypixel project
+# Welcome to your PeepMyPixel.com project
 
 ## Project info
 

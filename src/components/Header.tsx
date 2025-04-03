@@ -9,7 +9,7 @@ const Header: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-2">
             <Search className="text-primary h-6 w-6" />
-            <h1 className="text-xl font-bold">Peepmypixel</h1>
+            <h1 className="text-xl font-bold">PeepMyPixel.com</h1>
           </div>
           
           {/* Banner Ad Section */}
