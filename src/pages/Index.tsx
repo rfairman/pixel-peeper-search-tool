@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import UploadArea from '@/components/UploadArea';
@@ -74,7 +73,7 @@ const Index = () => {
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto mb-8">
-          <h2 className="text-2xl font-bold mb-6 text-center">Find higher resolution versions of your images</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">Find the highest resolution version of your images</h2>
           <UploadArea onImageUploaded={handleImageUploaded} />
         </div>
 
@@ -104,7 +103,7 @@ const Index = () => {
         <ResultsDisplay results={searchResults} isLoading={isSearching} />
       </main>
       <footer className="border-t border-border py-4 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Pixel Peeper. All rights reserved.
+        © {new Date().getFullYear()} PeepMyPixel.com. All rights reserved.
       </footer>
     </div>
   );
