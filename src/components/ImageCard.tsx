@@ -15,28 +15,21 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
 
   const handleDownload = async () => {
     try {
-      // Fetch the image
-      const response = await fetch(image.url);
-      if (!response.ok) throw new Error('Network response was not ok');
+      console.log("Starting download for:", image.url);
       
-      const blob = await response.blob();
-      
-      // Create a blob URL and trigger download
-      const blobUrl = window.URL.createObjectURL(blob);
+      // Create a download link
       const link = document.createElement('a');
-      link.href = blobUrl;
+      link.href = image.url;
       
       // Extract filename from URL or use a default name
       const fileName = image.url.split('/').pop() || `image-${image.id}.jpg`;
       link.download = fileName;
+      link.target = "_blank"; // Open in new tab if direct download fails
       
       // Append to body, click, and clean up
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
-      // Revoke the blob URL to free memory
-      window.URL.revokeObjectURL(blobUrl);
       
       toast({
         title: "Download started",
