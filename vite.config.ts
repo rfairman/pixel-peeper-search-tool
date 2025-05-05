@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: './', // Changed from '/' to './' for relative paths
+  base: './', // Keep ./ for relative paths - this is important for CSS loading
   server: {
     host: "::",
     port: 8080,
@@ -33,4 +33,4 @@ export default defineConfig(({ mode }) => ({
       }
     }
   }
-}));
+}))
