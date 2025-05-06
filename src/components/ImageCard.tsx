@@ -17,21 +17,21 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
 
   const handleDownload = () => {
     try {
-      console.log("Starting download for:", image.url);
+      console.log("Opening image in new tab:", image.url);
       
-      // Open the image in a new tab
-      window.open(image.url, '_blank');
+      // Open the image in a new tab with the correct URL
+      window.open(image.url, '_blank', 'noopener,noreferrer');
       
       toast({
         title: "Image opened in new tab",
         description: "Right-click on the image and select 'Save image as...' to download",
       });
     } catch (error) {
-      console.error('Download failed:', error);
+      console.error('Failed to open image:', error);
       setShowDownloadError(true);
       toast({
-        title: "Download failed",
-        description: "There was a problem downloading the image",
+        title: "Failed to open image",
+        description: "There was a problem opening the image in a new tab",
         variant: "destructive",
       });
     }
@@ -101,7 +101,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
-            <AlertDialogAction onClick={() => window.open(image.url, '_blank')}>
+            <AlertDialogAction onClick={() => window.open(image.url, '_blank', 'noopener,noreferrer')}>
               Open Image
             </AlertDialogAction>
           </AlertDialogFooter>
