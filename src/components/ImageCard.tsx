@@ -15,7 +15,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
   const { toast } = useToast();
   const [showDownloadError, setShowDownloadError] = React.useState(false);
 
-  const handleDownload = () => {
+  const handleOpenImage = () => {
     try {
       console.log("Opening image in new tab:", image.url);
       
@@ -68,7 +68,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
             variant="outline" 
             size="sm" 
             className="w-full" 
-            onClick={handleDownload}
+            onClick={handleOpenImage}
           >
             <Download className="h-3 w-3 mr-1" />
             Open Image

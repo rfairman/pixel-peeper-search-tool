@@ -26,10 +26,13 @@ export const generateMockResults = (baseUrl: string): ImageResult[] => {
   return dimensions.map((dimension, index) => {
     const domain = domains[index % domains.length];
     const fileSizes = ['2.4MB', '1.8MB', '1.2MB', '750KB', '500KB', '320KB', '180KB'];
+    const imageId = index + 1;
     
+    // Use the uploaded image as both the thumbnail and the actual image URL
+    // This ensures the "Open Image" button will open the correct image
     return {
       id: uuidv4(),
-      url: `https://${domain.url}/images/sample-${index + 1}.jpg`,
+      url: baseUrl, // Use the actual uploaded image URL for both thumbnail and full image
       thumbnailUrl: baseUrl,
       width: dimension.width,
       height: dimension.height,
