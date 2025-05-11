@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,6 +41,16 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
     }
   };
 
+  // Generate a display URL that's more user-friendly
+  const getDisplayUrl = () => {
+    // If it's a base64 image, show placeholder text
+    if (image.url.startsWith('data:')) {
+      return `${image.source} image`;
+    }
+    // Otherwise show the actual URL
+    return image.url;
+  };
+
   return (
     <>
       <Card className="overflow-hidden transition-all hover:border-primary/50">
@@ -60,7 +69,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
             <div>
               <h3 className="text-sm font-medium">{image.source}</h3>
               <p className="text-xs text-muted-foreground truncate max-w-[200px]">
-                {image.url}
+                {getDisplayUrl()}
               </p>
             </div>
             <div className="text-xs text-muted-foreground">
