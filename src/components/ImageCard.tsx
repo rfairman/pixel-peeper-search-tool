@@ -15,23 +15,28 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
   const { toast } = useToast();
   const [showDownloadError, setShowDownloadError] = React.useState(false);
 
-  const handleOpenImage = () => {
+  const handleDownload = () => {
     try {
-      console.log("Opening image in new tab:", image.url);
+      console.log("Downloading image:", image.url);
       
-      // Open the image in a new tab with the correct URL
-      window.open(image.url, '_blank', 'noopener,noreferrer');
+      // Create an anchor element
+      const link = document.createElement('a');
+      link.href = image.url;
+      link.download = `image-${image.id}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
       toast({
-        title: "Image opened in new tab",
-        description: "Right-click on the image and select 'Save image as...' to download",
+        title: "Download started",
+        description: "Your image is being downloaded",
       });
     } catch (error) {
-      console.error('Failed to open image:', error);
+      console.error('Failed to download image:', error);
       setShowDownloadError(true);
       toast({
-        title: "Failed to open image",
-        description: "There was a problem opening the image in a new tab",
+        title: "Download failed",
+        description: "There was a problem downloading the image",
         variant: "destructive",
       });
     }
@@ -68,10 +73,10 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
             variant="outline" 
             size="sm" 
             className="w-full" 
-            onClick={handleOpenImage}
+            onClick={handleDownload}
           >
             <Download className="h-3 w-3 mr-1" />
-            Open Image
+            Download
           </Button>
           <Button 
             variant="outline" 
@@ -94,7 +99,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
               The image couldn't be downloaded directly due to cross-origin restrictions.
               You can try these alternatives:
               <ul className="list-disc pl-5 mt-2">
-                <li>Click "Open Image" to open it in a new tab, then right-click and select "Save image as..."</li>
+                <li>Right-click on the image thumbnail and select "Save image as..."</li>
                 <li>Click the external link button to visit the source website</li>
               </ul>
             </AlertDialogDescription>
@@ -102,7 +107,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
             <AlertDialogAction onClick={() => window.open(image.url, '_blank', 'noopener,noreferrer')}>
-              Open Image
+              Open in New Tab
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
