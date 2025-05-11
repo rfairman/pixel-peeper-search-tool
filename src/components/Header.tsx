@@ -21,7 +21,7 @@ const Header: React.FC = () => {
           </div>
           
           <div className="text-sm text-muted-foreground hidden md:block">
-            Find high resolution images
+            Find highest resolution images
           </div>
         </div>
       </div>
