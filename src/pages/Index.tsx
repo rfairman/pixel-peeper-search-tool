@@ -10,7 +10,7 @@ import { generateMockResults } from '@/lib/mockData';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
-const MAX_FREE_CREDITS = 5;
+const MAX_FREE_CREDITS = 3;
 const CREDITS_STORAGE_KEY = 'search_credits_remaining';
 
 const Index = () => {
