@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import UploadArea from '@/components/UploadArea';
 import ResultsDisplay from '@/components/ResultsDisplay';
@@ -7,6 +8,10 @@ import { Search } from 'lucide-react';
 import { ImageResult, SearchResponse } from '@/lib/types';
 import { generateMockResults } from '@/lib/mockData';
 import { useToast } from '@/components/ui/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+
+const MAX_FREE_CREDITS = 5;
+const CREDITS_STORAGE_KEY = 'search_credits_remaining';
 
 const Index = () => {
   const { toast } = useToast();
@@ -14,11 +19,31 @@ const Index = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<ImageResult[]>([]);
+  const [creditsRemaining, setCreditsRemaining] = useState<number>(MAX_FREE_CREDITS);
+  const [showCreateAccountDialog, setShowCreateAccountDialog] = useState<boolean>(false);
+
+  // Load credits from localStorage on component mount
+  useEffect(() => {
+    const storedCredits = localStorage.getItem(CREDITS_STORAGE_KEY);
+    if (storedCredits !== null) {
+      setCreditsRemaining(parseInt(storedCredits, 10));
+    } else {
+      // Initialize with max credits if not set yet
+      localStorage.setItem(CREDITS_STORAGE_KEY, MAX_FREE_CREDITS.toString());
+    }
+  }, []);
 
   const handleImageUploaded = (file: File, preview: string) => {
     setUploadedFile(file);
     setPreviewUrl(preview);
     setSearchResults([]);
+  };
+
+  const decrementCredits = () => {
+    const newCreditsValue = creditsRemaining - 1;
+    setCreditsRemaining(newCreditsValue);
+    localStorage.setItem(CREDITS_STORAGE_KEY, newCreditsValue.toString());
+    return newCreditsValue;
   };
 
   const handleSearch = async () => {
@@ -28,6 +53,12 @@ const Index = () => {
         description: "Please upload an image first",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Check credits before searching
+    if (creditsRemaining <= 0) {
+      setShowCreateAccountDialog(true);
       return;
     }
 
@@ -45,11 +76,21 @@ const Index = () => {
       };
       
       if (mockResponse.success) {
+        // Decrement credits after successful search
+        const remainingCredits = decrementCredits();
+        
         setSearchResults(mockResponse.results);
         toast({
           title: "Search complete",
-          description: `Found ${mockResponse.results.length} results`,
+          description: `Found ${mockResponse.results.length} results. You have ${remainingCredits} credit${remainingCredits !== 1 ? 's' : ''} left.`,
         });
+        
+        // Show create account dialog if this was the last credit
+        if (remainingCredits <= 0) {
+          setTimeout(() => {
+            setShowCreateAccountDialog(true);
+          }, 1500);
+        }
       } else {
         toast({
           title: "Search failed",
@@ -68,12 +109,40 @@ const Index = () => {
     }
   };
 
+  const handleCreateAccount = () => {
+    // In a real app, this would redirect to a signup page
+    toast({
+      title: "Create Account",
+      description: "This would redirect to a signup page in a real app.",
+    });
+    setShowCreateAccountDialog(false);
+  };
+
+  const handleRestoreCredits = () => {
+    // For demo purposes only - this lets users reset their credits
+    setCreditsRemaining(MAX_FREE_CREDITS);
+    localStorage.setItem(CREDITS_STORAGE_KEY, MAX_FREE_CREDITS.toString());
+    toast({
+      title: "Credits Restored",
+      description: `Your ${MAX_FREE_CREDITS} free credits have been restored for demo purposes.`,
+    });
+    setShowCreateAccountDialog(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto mb-8">
           <h2 className="text-2xl font-bold mb-6 text-center">Find the highest resolution version of your images</h2>
+          
+          {/* Credits display */}
+          <div className="flex items-center justify-center mb-4">
+            <div className="bg-muted px-4 py-2 rounded-full text-sm">
+              <span className="font-semibold">{creditsRemaining}</span> credit{creditsRemaining !== 1 ? 's' : ''} remaining
+            </div>
+          </div>
+          
           <UploadArea onImageUploaded={handleImageUploaded} />
         </div>
 
@@ -93,7 +162,7 @@ const Index = () => {
               ) : (
                 <span className="flex items-center">
                   <Search className="mr-2 h-4 w-4" />
-                  Search for higher resolution
+                  Search for higher resolution {creditsRemaining > 0 ? `(1 credit)` : `(No credits left)`}
                 </span>
               )}
             </Button>
@@ -102,6 +171,34 @@ const Index = () => {
 
         <ResultsDisplay results={searchResults} isLoading={isSearching} />
       </main>
+      
+      {/* Create Account Dialog */}
+      <Dialog open={showCreateAccountDialog} onOpenChange={setShowCreateAccountDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>You've used all your free credits</DialogTitle>
+            <DialogDescription>
+              Create an account to continue searching for high-resolution images. Unlock additional features and more credits!
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col space-y-4 py-4">
+            <Button onClick={handleCreateAccount} className="w-full">
+              Create Free Account
+            </Button>
+            
+            {/* For demo purposes only, allow restoring credits */}
+            <Button variant="outline" onClick={handleRestoreCredits} className="w-full">
+              Restore Demo Credits
+            </Button>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row sm:justify-between">
+            <p className="text-xs text-muted-foreground">
+              This is a demo feature. In a real application, account creation would enable more searches.
+            </p>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <footer className="border-t border-border py-4 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} PeepMyPixel.com. All rights reserved.
       </footer>
