@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import UploadArea from '@/components/UploadArea';
@@ -9,6 +8,7 @@ import { ImageResult, SearchResponse } from '@/lib/types';
 import { generateMockResults } from '@/lib/mockData';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import SignupForm from '@/components/SignupForm';
 
 const MAX_FREE_CREDITS = 3;
 const CREDITS_STORAGE_KEY = 'search_credits_remaining';
@@ -21,6 +21,7 @@ const Index = () => {
   const [searchResults, setSearchResults] = useState<ImageResult[]>([]);
   const [creditsRemaining, setCreditsRemaining] = useState<number>(MAX_FREE_CREDITS);
   const [showCreateAccountDialog, setShowCreateAccountDialog] = useState<boolean>(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   // Load credits from localStorage on component mount
   useEffect(() => {
@@ -109,13 +110,35 @@ const Index = () => {
     }
   };
 
+  const handleSignup = async (formData: { name: string, email: string, password: string }) => {
+    setIsSigningUp(true);
+    
+    try {
+      // In a real app, this would send the data to a backend API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Mock successful signup
+      toast({
+        title: "Account created!",
+        description: `Welcome to PeepMyPixel, ${formData.name}!`,
+      });
+      
+      // Restore credits after signup
+      handleRestoreCredits();
+      setShowCreateAccountDialog(false);
+    } catch (error) {
+      toast({
+        title: "Signup failed",
+        description: "An error occurred during account creation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSigningUp(false);
+    }
+  };
+
   const handleCreateAccount = () => {
-    // In a real app, this would redirect to a signup page
-    toast({
-      title: "Create Account",
-      description: "This would redirect to a signup page in a real app.",
-    });
-    setShowCreateAccountDialog(false);
+    // We're now showing the form directly, no need to do anything here
   };
 
   const handleRestoreCredits = () => {
@@ -176,23 +199,20 @@ const Index = () => {
       <Dialog open={showCreateAccountDialog} onOpenChange={setShowCreateAccountDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>You've used all your free credits</DialogTitle>
+            <DialogTitle>Create your account</DialogTitle>
             <DialogDescription>
-              Create an account to continue searching for high-resolution images. Unlock additional features and more credits!
+              Sign up to get more credits and unlock all features!
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col space-y-4 py-4">
-            <Button onClick={handleCreateAccount} className="w-full">
-              Create Free Account
-            </Button>
-            
+          
+          <SignupForm onSubmit={handleSignup} isLoading={isSigningUp} />
+          
+          <DialogFooter className="flex-col space-y-2 mt-4">
             {/* For demo purposes only, allow restoring credits */}
             <Button variant="outline" onClick={handleRestoreCredits} className="w-full">
               Restore Demo Credits
             </Button>
-          </div>
-          <DialogFooter className="flex-col sm:flex-row sm:justify-between">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground text-center">
               This is a demo feature. In a real application, account creation would enable more searches.
             </p>
           </DialogFooter>
