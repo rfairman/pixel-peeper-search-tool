@@ -13,8 +13,8 @@ const Header: React.FC = () => {
             <h1 className="text-xl font-bold">PeepMyPixel.com</h1>
           </Link>
           
-          {/* Banner Ad Section */}
-          <div className="w-full md:w-auto min-h-[90px] bg-secondary/10 rounded flex items-center justify-center border border-border">
+          {/* Banner Ad Section - Hidden visually but kept in DOM */}
+          <div className="w-full md:w-auto min-h-[90px] hidden">
             <div className="text-sm text-muted-foreground p-2">
               Banner Ad Space (728×90)
             </div>
