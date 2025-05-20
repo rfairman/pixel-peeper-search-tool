@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -15,7 +14,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/lib/AuthProvider';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -32,12 +32,14 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface SignupFormProps {
-  onSubmit: (values: FormValues) => void;
+  onSubmit?: (values: FormValues) => void;
   isLoading?: boolean;
 }
 
-const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, isLoading = false }) => {
+const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, isLoading: externalIsLoading = false }) => {
   const { toast } = useToast();
+  const { signUp } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -48,9 +50,33 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, isLoading = false }) 
     },
   });
 
-  const handleSubmit = (values: FormValues) => {
-    onSubmit(values);
+  const handleSubmit = async (values: FormValues) => {
+    // If external onSubmit is provided, use that
+    if (onSubmit) {
+      onSubmit(values);
+      return;
+    }
+    
+    // Otherwise use the internal auth state
+    setIsLoading(true);
+    try {
+      await signUp(values.email, values.password, values.name);
+      toast({
+        title: "Account created!",
+        description: `Welcome to PeepMyPixel, ${values.name}!`,
+      });
+    } catch (error) {
+      toast({
+        title: "Signup failed",
+        description: error instanceof Error ? error.message : "An error occurred during account creation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const loading = externalIsLoading || isLoading;
 
   return (
     <Form {...form}>
@@ -107,8 +133,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, isLoading = false }) 
         />
         
         <div className="pt-2">
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? (
               <span className="flex items-center">
                 <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-primary-foreground border-r-transparent" />
                 Creating account...
